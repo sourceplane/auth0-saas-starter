@@ -4,7 +4,7 @@
 |---|---|---|
 | A00 — the spec | ✅ | the repository's first commit |
 | A01 — the B2B SaaS on Workers | ✅ | A0-2 |
-| A02 — a baseline | planned | A0-3 |
+| A02 — a baseline | ✅ | A0-3, tagged `baseline-v1` |
 
 ## Departures from the upstream template
 
