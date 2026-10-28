@@ -1,0 +1,32 @@
+# The epic's declaration. metadata.name equals the directory name; metadata.key
+# is the task-key prefix this epic reserves (A0 → A0-1, A0-2, …). Owner, target
+# date and health are the platform's — never written here.
+apiVersion: orun.io/v1
+kind: Epic
+metadata:
+  name: auth0-saas-starter
+  key: A0
+spec:
+  title: "Vercel's SaaStart (Auth0 + Next.js SaaS Starter Kit) on Cloudflare Workers"
+  summary: "Auth0's B2B SaaS starter — sign-up into an organization, members, invitations and roles, self-service SSO and SCIM, MFA and security policies, all in an Auth0 tenant through its Management API, no database — runs on Cloudflare Workers + Static Assets through @opennextjs/cloudflare, with upstream's tenant-bootstrap CLI turned into an idempotent command that stores a tenant's configuration as Orun secrets and a site that serves before any tenant exists, inside the Cirrus baseline's repository conventions, and becomes an Orun baseline that takes a new site from nothing to live on stage and prod in one landing."
+  state: started
+  milestones:
+    - name: "A00 — the spec"
+      exitCriteria:
+        - "the repository is born with its intent, CI, tooling and spec index, and this doc set and the task contracts are on main"
+      tasks: [A0-1]
+    - name: "A01 — the B2B SaaS on Workers"
+      exitCriteria:
+        - "apps/web is the upstream template, built by OpenNext into one Worker with Static Assets, the Auth0 SDK's middleware running in it"
+        - "with no tenant the home page renders a connect-Auth0 notice and the routes that need Auth0 send the visitor home; with one, the template is unchanged and a whole sign-in works"
+        - "the tenant bootstrap is idempotent — a second run changes nothing — and stores the configuration as the environment's Orun secrets, printing no value"
+        - "no credential is in a bundle: the deploy hands the configuration to the Worker as Worker secrets"
+        - "`pnpm typecheck`, `pnpm lint`, `pnpm test` and `pnpm build` are green, and the Worker fits Workers Free"
+        - "the README says how to run, test, preview and deploy it, how to connect Auth0, and how every Vercel piece maps to Cloudflare"
+      tasks: [A0-2]
+    - name: "A02 — a baseline"
+      exitCriteria:
+        - "blueprint.yaml (the console card) and repo-blueprint.yaml (the build) take a new site from nothing to live on stage and prod in one landing, then record it"
+        - "a site built from it carries the site and its tenant bootstrap only, renamed throughout to its own name, repository and Worker, with the template's credit intact"
+        - "Baseline CI is green: contract tests, generated component docs, the blueprint read by the pinned orun, the leak gate, the offline bootstrap and the end-to-end tier, without Auth0 and connected to a stand-in tenant"
+      tasks: [A0-3]

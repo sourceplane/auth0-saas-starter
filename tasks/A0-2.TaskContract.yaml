@@ -1,0 +1,23 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: A0-2
+  title: "The B2B SaaS on Workers"
+spec:
+  goal: Auth0's B2B SaaS starter runs on Cloudflare Workers + Static Assets through OpenNext, serves before a tenant is connected, keeps every credential out of the bundles, and its tenant bootstrap sets a tenant up idempotently and stores the configuration as Orun secrets
+  affects:
+    - apps/web
+    - tests/web
+    - tooling/auth0
+    - tooling/wire
+    - package.json
+    - pnpm-lock.yaml
+    - pnpm-workspace.yaml
+    - README.md
+    - .gitignore
+  doneWhen:
+    - pnpm typecheck, lint, test and build are green
+    - wrangler dev serves every route unconnected, and connected to a stand-in tenant signs a visitor in
+    - a second run of the tenant bootstrap changes nothing
+    - the Worker is under Workers Free's 3 MiB gzipped
+  gates: []
