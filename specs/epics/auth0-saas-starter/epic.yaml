@@ -9,7 +9,7 @@ metadata:
 spec:
   title: "Vercel's SaaStart (Auth0 + Next.js SaaS Starter Kit) on Cloudflare Workers"
   summary: "Auth0's B2B SaaS starter — sign-up into an organization, members, invitations and roles, self-service SSO and SCIM, MFA and security policies, all in an Auth0 tenant through its Management API, no database — runs on Cloudflare Workers + Static Assets through @opennextjs/cloudflare, with upstream's tenant-bootstrap CLI turned into an idempotent command that stores a tenant's configuration as Orun secrets and a site that serves before any tenant exists, inside the Cirrus baseline's repository conventions, and becomes an Orun baseline that takes a new site from nothing to live on stage and prod in one landing."
-  state: started
+  state: completed
   milestones:
     - name: "A00 — the spec"
       exitCriteria:
