@@ -1,0 +1,15 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: A0-1
+  title: "The spec"
+spec:
+  goal: The auth0-saas-starter epic's doc set — the design, the plan, the risks, the status — and its task contracts are on main
+  affects:
+    - specs/epics/auth0-saas-starter
+    - specs/epics/README.md
+    - tasks
+  doneWhen:
+    - epic.yaml declares key A0 and the three milestones
+    - every task has a contract
+  gates: []
