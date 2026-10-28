@@ -1,0 +1,170 @@
+apiVersion: sourceplane.io/v1
+kind: Intent
+
+metadata:
+  name: auth0-saas-starter
+  description: A B2B SaaS on Auth0 — sign-up into an organization, members and roles, SSO and security policies — on Cloudflare Workers + Static Assets
+  namespace: sourceplane
+
+execution:
+  state:
+    backendUrl: https://api-edge-prod.oruncloud.workers.dev
+    # Declared, enforced tenancy: the workspace claim is sent on every remote op
+    # (including the credential-free CI OIDC exchange) so the platform can
+    # enforce claim ⊆ authorized. Declaring it implies strict mode — a
+    # non-interactive run that resolves no workspace fails fast.
+    #
+    # `ws_CHANGE_ME` is the one value `ci.yml` treats as "not linked yet" and
+    # plans nothing for. A bootstrap writes the product's workspace here; by
+    # hand, set it to yours (`orun cloud link`) and the Orun pipeline runs.
+    workspace: ws_CHANGE_ME
+    requireOrg: true
+    # Push the resolved catalog after a successful plan on the default branch,
+    # keeping the workspace-global catalog head fresh without an explicit
+    # `--push-catalog`.
+    autopushCatalog: true
+  # Lanes (orun ≥ v2.76.0): CI runs one GitHub job per LANE, not per orun job.
+  lanes:
+    mode: auto
+    maxLanes: 6
+    concurrency: 6
+
+compositions:
+  sources:
+    # The composition stack lives in sourceplane/stack-tectonic and is consumed
+    # as a published OCI artifact rather than a repo-local directory. Pin an
+    # explicit version: a bare repository reference resolves to `:latest`,
+    # which would let a catalog release change this repo's execution contracts
+    # without a commit here. Bumping the tag is the deliberate upgrade step.
+    #
+    # 0.19.0, NOT 0.20.0 (cirrus-baseline's pin). 0.20.0 makes the workspace
+    # install lane-scoped: it runs once in the source checkout and every job's
+    # staged tree LINKS its top-level node_modules there — out of the tree. Next
+    # 16 builds with Turbopack, which refuses a dependency that resolves outside
+    # its root ("Symlink apps/web/node_modules/next is invalid, it points out of
+    # the filesystem root"): the first live bootstrap's lanes died on it. A
+    # webpack build gets past the symlink but breaks next/og on Workers (its
+    # Node build reads fonts and compiles wasm at runtime), and turbopack.root
+    # cannot move without moving outputFileTracingRoot, and OpenNext's standalone
+    # layout with it. Under 0.19.0 the job installs inside its own tree, and the
+    # site has one job per lane (`lane: isolated`), so the shared install would
+    # save nothing anyway. testing/e2e.test.sh stages the job with whichever
+    # layout the pinned composition plans, so a bump is tested, not assumed.
+    - name: stack-tectonic
+      kind: oci
+      ref: oci://ghcr.io/sourceplane/stack-tectonic:0.19.0
+  resolution:
+    precedence:
+      - stack-tectonic
+    bindings:
+      terraform: stack-tectonic
+      cloudflare-domain: stack-tectonic
+      db-migrate: stack-tectonic
+
+discovery:
+  roots:
+    - apps/
+    - infra/
+    - packages/
+    - tests/
+
+# Where the work lives (initiative-lifecycle): an epic is a directory with an
+# epic.yaml under `epics`, a task a contract under `tasks`; the `orun plan` on
+# main reconciles the tree into the workspace's work plane after a merge.
+#
+# THIS BLOCK IS THE BASELINE'S OWN. A site built from this baseline has no
+# `specs/` and no `tasks/` (its bootstrap work lives on the platform), so
+# 01-product removes the block, and this comment with it, from the
+# product's copy (tooling/bootstrap/work-tree.mjs).
+work:
+  epics: specs/epics
+  tasks: tasks
+  sync: on-merge
+
+automation:
+  triggerBindings:
+    github-pull-request:
+      description: Pull request validation
+      on:
+        provider: github
+        event: pull_request
+        actions:
+          - opened
+          - synchronize
+          - reopened
+          - ready_for_review
+        baseBranches:
+          - main
+      plan:
+        scope: changed
+        base: pull_request.base.sha
+        head: pull_request.head.sha
+
+    github-push-main:
+      description: Main branch stack convergence after merge
+      on:
+        provider: github
+        event: push
+        branches:
+          - main
+
+    local-development:
+      description: Local testing with full Terraform execution
+      on:
+        provider: local
+
+environments:
+  dev:
+    description: Verify-only. Pull requests plan and verify here; nothing is deployed.
+    activation:
+      triggerRefs:
+        - github-pull-request
+        - github-push-main
+        - local-development
+    dependencyMode: advisory
+    policies:
+      requireApproval: "false"
+    env:
+      BASE_DOMAIN: auth0-saas-starter.example.com
+
+  # SITE_URL, set under an environment's `env:`, is the site's public origin
+  # for that environment's build — sitemap, RSS, Open Graph and JSON-LD links
+  # are absolute. Unset, the build uses the environment's workers.dev URL. Set
+  # it once a custom domain answers for the environment (README, "Custom
+  # domain"); the next deploy of apps/web picks it up.
+  stage:
+    description: Deployed on every merge to main, before prod.
+    url: https://auth0-saas-starter-web-stage.your-workers-subdomain.workers.dev
+    activation:
+      triggerRefs:
+        - github-pull-request
+        - github-push-main
+    policies:
+      requireApproval: "false"
+    env:
+      BASE_DOMAIN: auth0-saas-starter.example.com
+
+  prod:
+    description: Where visitors are. Deploys after stage converges on the same commit.
+    url: https://auth0-saas-starter-web-prod.your-workers-subdomain.workers.dev
+    activation:
+      triggerRefs:
+        - github-pull-request
+        - github-push-main
+    promotion:
+      dependsOn:
+        - environment: stage
+    policies:
+      requireApproval: "false"
+    env:
+      BASE_DOMAIN: auth0-saas-starter.example.com
+
+# Repo-level catalog entity: front page + role-tagged docs (rendered in the
+# workspace Docs library, pinned to the commit by `orun plan`).
+repo:
+  displayName: auth0-saas-starter
+  docs:
+    overview: README.md
+    pages:
+      - { path: ai/context/operations.md, role: runbook, title: Operating contract }
+      - { path: ai/context/deployment.md, role: reference, title: Live deployment manifest }
