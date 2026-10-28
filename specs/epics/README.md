@@ -7,6 +7,6 @@ folder is the adoption; the merge creates the epic in the workspace.
 
 | Epic | Cluster | Status | What it is |
 |------|---------|--------|------------|
-| [`auth0-saas-starter/`](./auth0-saas-starter/) | **A0** | In progress (A00) | Vercel's SaaStart (Auth0 + Next.js SaaS Starter Kit) — Auth0's B2B SaaS starter on Auth0 Organizations — on Cloudflare Workers + Static Assets through OpenNext, with an idempotent tenant bootstrap that stores the tenant's configuration as Orun secrets, and an Orun baseline that instantiates it (A02) |
+| [`auth0-saas-starter/`](./auth0-saas-starter/) | **A0** | In progress (A01: the site on Workers) | Vercel's SaaStart (Auth0 + Next.js SaaS Starter Kit) — Auth0's B2B SaaS starter on Auth0 Organizations — on Cloudflare Workers + Static Assets through OpenNext, with an idempotent tenant bootstrap that stores the tenant's configuration as Orun secrets, and an Orun baseline that instantiates it (A02) |
 
 As-built ≠ intent: what shipped lives in each epic's `IMPLEMENTATION-STATUS.md`.

@@ -11,7 +11,7 @@ one landing.**
 
 | | |
 |---|---|
-| Status | In progress — A00 on main |
+| Status | In progress — A01 on main: the site runs on Workers |
 | Upstream | [auth0-developer-hub/auth0-b2b-saas-starter](https://github.com/auth0-developer-hub/auth0-b2b-saas-starter) (MIT), at `12ad50e` (2026-02-13) |
 | Reference | [portfolio-starter-kit](https://github.com/sourceplane/portfolio-starter-kit) — the scaffolding, tests and bootstrap; [clerk-auth-starter](https://github.com/sourceplane/clerk-auth-starter) — a SaaS auth provider as optional Orun secrets, pushed to the Worker by the deploy; [saas-starter](https://github.com/sourceplane/saas-starter) — the B2B SaaS shape |
 | Key | `A0` |
