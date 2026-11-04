@@ -60,7 +60,7 @@ const nextConfig: NextConfig = {
     // build` runs with NODE_ENV=production, so production keeps its
     // same-origin check.
     ...(process.env.NODE_ENV === "development"
-      ? { serverActions: { allowedOrigins: ["*.orun-preview.app", "preview-gateway-stage.oruncloud.workers.dev", "abc123def456.orun-preview.app:13000"] } }
+      ? { serverActions: { allowedOrigins: ["*.orun-preview.app", "preview-gateway-stage.oruncloud.workers.dev"] } }
       : {}),
   },
 }
